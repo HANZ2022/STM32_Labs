@@ -1,0 +1,17 @@
+17:21:12 **** Incremental Build of configuration Debug for project ECED4402_2022 ****
+make -j12 all 
+arm-none-eabi-gcc "../Core/Src/User/main_user.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/User/main_user.d" -MT"Core/Src/User/main_user.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/User/main_user.o"
+arm-none-eabi-gcc -o "ECED4402_2022.elf" @"objects.list"   -mcpu=cortex-m4 -T"D:\STM32CubeIDE\ECED4402 Lab2\ECED4402_2022\STM32F411RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="ECED4402_2022.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: ECED4402_2022.elf
+ 
+arm-none-eabi-size   ECED4402_2022.elf 
+arm-none-eabi-objdump -h -S  ECED4402_2022.elf  > "ECED4402_2022.list"
+   text	   data	    bss	    dec	    hex	filename
+  24176	    112	  21000	  45288	   b0e8	ECED4402_2022.elf
+Finished building: default.size.stdout
+ 
+Finished building: ECED4402_2022.list
+ 
+
+17:21:12 Build Finished. 0 errors, 0 warnings. (took 761ms)
+

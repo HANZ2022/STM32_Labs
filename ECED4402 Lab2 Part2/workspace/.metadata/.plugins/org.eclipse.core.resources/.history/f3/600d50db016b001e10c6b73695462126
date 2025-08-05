@@ -1,0 +1,111 @@
+/*
+ * main_user.c
+ *
+ *  Created on: Aug 8, 2022
+ *      Author: Andre Hendricks
+ */
+
+#include <stdio.h>
+
+//STM32 generated header files
+#include "main.h"
+
+//User generated header files
+#include "User/main_user.h"
+#include "User/util.h"
+
+//Required FreeRTOS header files
+#include "FreeRTOS.h"
+#include "task.h"
+
+char main_string[50];
+uint32_t main_counter = 0;
+
+
+
+void PrintTaskId(void *params)
+{
+	/*Get the Id*/
+	int taskId = (int)params;
+
+	while (1)
+	{
+		printf("Task %d is printing\r\n", taskId);
+		vTaskDelay(1000 / portTICK_RATE_MS);
+	}
+}
+
+
+static void main_task(uint16_t GPIO_Pin)
+{
+	char ibuff[50];
+	TaskHandle_t xHandle[50];
+	/*Variable used to keep track of sub tasks created with button*/
+	size_t val;
+	int taskid = 0;
+
+	do {
+		print_str("Main task loop executing ");
+		// Update hexadecimal 32-bit integer in string, and print it
+		sprintf(main_string,"Main task iteration: 0x%08x\r\n",(unsigned int)main_counter++);
+		print_str(main_string);
+
+		//Create new task if button A was pressed
+		if(GPIO_Pin == GPIO_PIN_10)
+		{
+			/* Button A was pressed*/
+			if (xTaskCreate(&PrintTaskID,(const char*)"subtask",configMINIMAL_STACK_SIZE+100,
+					&taskid,tskIDLE_PRIORITY+2,&xHandle[taskid])!=pdPASS)
+			{
+				sprintf(ibuff,"Failed creating new task %d \r\n",taskid);
+				print_str(ibuff);
+			}
+			else
+			{
+				sprintf(ibuff,"Created a new task %d \r\n", taskid);
+				print_str(ibuff);
+				/*Increment taskid counter*/
+				taskid = taskid + 1;
+			}
+
+				//Delete new task if button B was pressed
+		}
+		else if(  (GPIO_Pin == GPIO_PIN_12) && (taskid > 0) )
+		{
+			/*Button B was pressed*/
+			/*Decrement taskid counter*/
+			taskid = taskid - 1;
+			vTaskDelete(xHandle[taskid]);
+			sprintf(ibuff,"Deleted task new task %d \r\n", taskid);
+			print_str(ibuff);
+		}
+
+		val = xPortGetFreeHeapSize() ;
+		sprintf(ibuff,"Size = %d Bytes\r\n",val);
+		print_str(ibuff);
+		vTaskDelay(1000 / portTICK_RATE_MS);
+	} while(1);
+}
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
+	if(GPIO_Pin == GPIO_PIN_10){
+		print_str_ISR("Button A Pressed\r\n");
+		HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_0);
+	}
+
+	if(GPIO_Pin == GPIO_PIN_12){
+		print_str_ISR("Button B Pressed\r\n");
+		HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_1);
+	}
+}
+
+void main_user(){
+	util_init();
+
+	xTaskCreate(main_task,"Main Task", configMINIMAL_STACK_SIZE + 100, GPIO_Pin, tskIDLE_PRIORITY + 2, NULL);
+
+	vTaskStartScheduler();
+
+	while(1);
+
+}

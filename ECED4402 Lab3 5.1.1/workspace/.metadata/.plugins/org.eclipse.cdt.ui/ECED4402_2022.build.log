@@ -1,0 +1,15 @@
+16:24:48 **** Incremental Build of configuration Debug for project ECED4402_2022 ****
+make -j12 all 
+arm-none-eabi-gcc "../Core/Src/User/util.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/User/util.d" -MT"Core/Src/User/util.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/User/util.o"
+../Core/Src/User/util.c:14:8: error: unknown type name 'UART_HandleTypeDef'
+   14 | extern UART_HandleTypeDef huart2;
+      |        ^~~~~~~~~~~~~~~~~~
+../Core/Src/User/util.c: In function 'print_str_local':
+../Core/Src/User/util.c:21:9: warning: implicit declaration of function 'HAL_UART_Transmit' [-Wimplicit-function-declaration]
+   21 |         HAL_UART_Transmit(&huart2,(uint8_t*) str, strlen(str), HAL_MAX_DELAY);
+      |         ^~~~~~~~~~~~~~~~~
+make: *** [Core/Src/User/subdir.mk:22: Core/Src/User/util.o] Error 1
+"make -j12 all" terminated with exit code 2. Build might be incomplete.
+
+16:24:48 Build Failed. 2 errors, 1 warnings. (took 303ms)
+

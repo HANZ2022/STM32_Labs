@@ -1,0 +1,77 @@
+/*
+ * main_user.c
+ *
+ *  Created on: Aug 8, 2022
+ *      Author: Andre Hendricks
+ */
+
+#include <stdio.h>
+
+//STM32 generated header files
+#include "main.h"
+
+//User generated header files
+#include "User/main_user.h"
+#include "User/util.h"
+
+//Required FreeRTOS header files
+#include "FreeRTOS.h"
+#include "task.h"
+#include "queue.h"
+#include "semphr.h"
+
+char main_string[50];
+uint32_t main_counter = 0;
+
+QueueHandle_t xQueue;
+char receiver_string[50];
+
+uint32_t SharedCounter = 0;
+
+static SemaphoreHandle_t mutex;
+
+
+/*****************************************************/
+static void vSharedCounterTask( void *pvParameters )
+{
+	uint32_t buffer =0;
+	char ibuff[50];
+	for( ;; )
+	{
+		if(xSemaphoreTake(mutex, portMAX_DELAY))
+		{
+
+			/* The following set of operations is updating the SharedCounter
+		after a long delay. */
+			buffer = SharedCounter;
+			buffer++;
+			vTaskDelay(1000);
+			SharedCounter = buffer;
+			xSemaphoreGive(mutex);
+		}
+		// then, sending it to the USART.
+		sprintf(ibuff,"%ld\r\n",SharedCounter);
+		print_str(ibuff);
+	}
+}
+
+
+/*****************************************************/
+	void main_user(){
+
+		util_init();
+
+		mutex = xSemaphoreCreateMutex();
+	    if(mutex != NULL)
+	    {
+			// this task will increment by 1.
+			xTaskCreate( vSharedCounterTask, "SharedCounter 1", 1000, ( void * ) 1, 1, NULL );
+			// so will this one.
+			xTaskCreate( vSharedCounterTask, "SharedCounter 2", 1000, ( void * ) 1, 1, NULL );
+			vTaskStartScheduler();
+	    }
+		while(1); // we should never reach here.
+}
+
+
+
